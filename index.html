@@ -666,33 +666,32 @@ if(is_iframe){iframe_count+=1}}});if(image_count>0||iframe_count>0||rocketlazy_c
   // Obtem o idioma do navegador do usuário
   const userLanguage = navigator.language || navigator.languages[0];
 
-  // Define a linguagem padrão da página como francês
-  document.documentElement.lang = "fr";
-
-  // Objeto de traduções (adicionar mais conforme necessário)
+  // Objeto de traduções (com base no idioma do navegador)
   const translations = {
     en: {
-      "Hello, world!": "Bonjour, le monde!",
-      "Welcome": "Bienvenue",
-      "Goodbye": "Au revoir",
+      "Bonjour, le monde!": "Hello, world!",
+      "Bienvenue": "Welcome",
+      "Au revoir": "Goodbye",
     },
     es: {
-      "¡Hola, mundo!": "Bonjour, le monde!",
-      "Bienvenido": "Bienvenue",
-      "Adiós": "Au revoir",
+      "Bonjour, le monde!": "¡Hola, mundo!",
+      "Bienvenue": "Bienvenido",
+      "Au revoir": "Adiós",
     },
     // Adicione mais idiomas aqui, se necessário
   };
 
-  // Verifica se o idioma do usuário é francês
+  // A página será traduzida apenas se o idioma do usuário não for francês
   if (!userLanguage.startsWith("fr")) {
-    // Tradução automática com base no idioma do navegador
     document.addEventListener("DOMContentLoaded", () => {
+      // Seleciona todos os elementos da página
       document.querySelectorAll("*").forEach((element) => {
-        const text = element.textContent.trim();
-        const langKey = userLanguage.startsWith("es") ? "es" : "en"; // Exemplo com inglês e espanhol
+        const text = element.textContent.trim(); // Texto atual do elemento
+        const langKey = userLanguage.startsWith("es") ? "es" : "en"; // Define o idioma (exemplo: inglês ou espanhol)
+
+        // Verifica se existe uma tradução disponível para o texto
         if (translations[langKey] && translations[langKey][text]) {
-          element.textContent = translations[langKey][text];
+          element.textContent = translations[langKey][text]; // Aplica a tradução
         }
       });
     });
