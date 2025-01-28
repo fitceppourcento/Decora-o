@@ -663,38 +663,78 @@ if(is_iframe){iframe_count+=1}}});if(image_count>0||iframe_count>0||rocketlazy_c
 <span id="elementor-device-mode" class="elementor-screen-only"></span></body></html><!-- This website is like a Rocket, isn't it? Performance optimized by WP Rocket. Learn more: https://wp-rocket.me - Debug: cached@1738081069 -->
 
 <script>
-  // Obtem o idioma do navegador do usuário
-  const userLanguage = navigator.language || navigator.languages[0];
+  // Configurações da API (substitua pelos seus valores)
+  const apiKey = "SUA_CHAVE_API_AQUI"; // Adicione sua chave de API aqui
+  const translationApiUrl = "https://translation.googleapis.com/language/translate/v2"; // URL do Google Translate API
 
-  // Define a linguagem padrão da página como francês
+  // Define o idioma original da página como francês
   document.documentElement.lang = "fr";
 
-  // Objeto de traduções (adicionar mais conforme necessário)
-  const translations = {
-    en: {
-      "Hello, world!": "Bonjour, le monde!",
-      "Welcome": "Bienvenue",
-      "Goodbye": "Au revoir",
-    },
-    es: {
-      "¡Hola, mundo!": "Bonjour, le monde!",
-      "Bienvenido": "Bienvenue",
-      "Adiós": "Au revoir",
-    },
-    // Adicione mais idiomas aqui, se necessário
-  };
+  // Função para detectar o idioma do navegador e traduzir a página
+  async function detectAndTranslate() {
+    // Detecta o idioma do navegador
+    const userLanguage = navigator.language || navigator.languages[0];
 
-  // Verifica se o idioma do usuário é francês
-  if (!userLanguage.startsWith("fr")) {
-    // Tradução automática com base no idioma do navegador
-    document.addEventListener("DOMContentLoaded", () => {
-      document.querySelectorAll("*").forEach((element) => {
-        const text = element.textContent.trim();
-        const langKey = userLanguage.startsWith("es") ? "es" : "en"; // Exemplo com inglês e espanhol
-        if (translations[langKey] && translations[langKey][text]) {
-          element.textContent = translations[langKey][text];
+    // Se o idioma do usuário for francês, não traduz
+    if (userLanguage.startsWith("fr")) return;
+
+    // Seleciona todo o texto visível na página
+    const elements = document.querySelectorAll("*");
+
+    // Cria uma lista de textos únicos a serem traduzidos
+    const textsToTranslate = Array.from(elements)
+      .map((el) => el.textContent.trim())
+      .filter((text) => text.length > 0 && !text.startsWith("{{")) // Filtra textos válidos
+      .filter((value, index, self) => self.indexOf(value) === index); // Remove duplicatas
+
+    // Envia os textos para a API de tradução
+    try {
+      const translations = await translateText(textsToTranslate, userLanguage);
+
+      // Aplica as traduções à página
+      elements.forEach((el) => {
+        const originalText = el.textContent.trim();
+        if (translations[originalText]) {
+          el.textContent = translations[originalText];
         }
       });
-    });
+    } catch (error) {
+      console.error("Erro ao traduzir a página:", error);
+    }
   }
+
+  // Função para traduzir texto usando a API
+  async function translateText(texts, targetLanguage) {
+    // Prepara os textos para o corpo da solicitação
+    const body = {
+      q: texts,
+      target: targetLanguage.split("-")[0], // Apenas o código do idioma, ex: "en"
+      source: "fr", // Idioma original do site (francês)
+      format: "text",
+    };
+
+    // Faz a solicitação à API
+    const response = await fetch(${translationApiUrl}?key=${apiKey}, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      throw new Error(Erro na API: ${response.statusText});
+    }
+
+    const data = await response.json();
+
+    // Mapeia as traduções originais para as traduzidas
+    const translations = {};
+    data.data.translations.forEach((translation, index) => {
+      translations[texts[index]] = translation.translatedText;
+    });
+
+    return translations;
+  }
+
+  // Chama a função ao carregar a página
+  document.addEventListener("DOMContentLoaded", detectAndTranslate);
 </script>
