@@ -661,3 +661,40 @@ if(is_iframe){iframe_count+=1}}});if(image_count>0||iframe_count>0||rocketlazy_c
 
 
 <span id="elementor-device-mode" class="elementor-screen-only"></span></body></html><!-- This website is like a Rocket, isn't it? Performance optimized by WP Rocket. Learn more: https://wp-rocket.me - Debug: cached@1738081069 -->
+
+<script>
+  // Obtem o idioma do navegador do usuário
+  const userLanguage = navigator.language || navigator.languages[0];
+
+  // Define a linguagem padrão da página como francês
+  document.documentElement.lang = "fr";
+
+  // Objeto de traduções (adicionar mais conforme necessário)
+  const translations = {
+    en: {
+      "Hello, world!": "Bonjour, le monde!",
+      "Welcome": "Bienvenue",
+      "Goodbye": "Au revoir",
+    },
+    es: {
+      "¡Hola, mundo!": "Bonjour, le monde!",
+      "Bienvenido": "Bienvenue",
+      "Adiós": "Au revoir",
+    },
+    // Adicione mais idiomas aqui, se necessário
+  };
+
+  // Verifica se o idioma do usuário é francês
+  if (!userLanguage.startsWith("fr")) {
+    // Tradução automática com base no idioma do navegador
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll("*").forEach((element) => {
+        const text = element.textContent.trim();
+        const langKey = userLanguage.startsWith("es") ? "es" : "en"; // Exemplo com inglês e espanhol
+        if (translations[langKey] && translations[langKey][text]) {
+          element.textContent = translations[langKey][text];
+        }
+      });
+    });
+  }
+</script>
